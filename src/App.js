@@ -14,12 +14,9 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
-import PhotoIcon from '@mui/icons-material/Photo';
+import Dashboard from './pages/dashboard/dashboard'
 import SmartphoneIcon from '@mui/icons-material/Smartphone';
 import GamesIcon from '@mui/icons-material/Games';
-import GarageIcon from '@mui/icons-material/Garage';
 import DiscountIcon from '@mui/icons-material/Discount';
 import logo from './assets/logo (2).png';
 import './App.css';
@@ -27,16 +24,18 @@ import PrecisionManufacturingIcon from '@mui/icons-material/PrecisionManufacturi
 import axios from 'axios';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import Home from './pages/Home';
+import SignIn from './pages/Sign In';
+import SignUp from './pages/Sign up';
 import Footer from './components/footer/Footer';
 import { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import {Link } from "react-router-dom";
 import VolumeUpIcon from '@mui/icons-material/VolumeUp';
-
+import Details from './pages/Details/Details';
 import FilterResult from './pages/FilterResult/FilterResult'
 import Categorie from './pages/Categorie/Categorie';
 import ConstructionIcon from '@mui/icons-material/Construction';
-
+import CheckoutForm from './components/CheckoutForm';
 const drawerWidth = 240;
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })(
@@ -104,19 +103,42 @@ export default function PersistentDrawerLeft() {
   }, []);
 
   const getObjets = async () => {
-    var response = await axios.get("http://localhost:3001/objets");
+    var response = await axios.get("https://mocki.io/v1/10385da0-d991-4c3c-8c5c-4973477cd44e");
     setObjets(response.data);
 
   };
+  const [filteredstuffs, setfilteredstuffs] = useState([]);
 
+  const handleSearchTerm = () => {
+    
+    if(SearchTerm.length > 0){
+    var filtered = Objets.filter(item => item.objet.toLowerCase().includes(SearchTerm.toLowerCase()));
+    console.log(filtered)
+    setfilteredstuffs(filtered)
+
+  }
+    else{
+      setfilteredstuffs(Objets)
+    }
+  };
+
+  const [Borrowed, setBorrowed] = useState('');
+  const [SingleObject, setSingleObject] = useState({});
   const [IdCategorie, setIdCategorie] = useState('');
+  const [ObjectCategorie, setObjectCategorie] = useState([]);
+  const [SearchTerm, setSearchTerm] = useState("");
 
+  
+function reset (){
+  document.getElementById('allcategorystuffs').style.display='grid';
+  document.getElementById('somecategorystuffs').style.display='none';
+}
   return (
     <Box sx={{ display: 'flex' }}>
               <BrowserRouter>
 
       <CssBaseline />
-      <AppBar position="fixed" open={open} >
+      <AppBar position="fixed" open={open} id='appbar'>
         <Toolbar className='Topbar'>
           <div className='Topbar'>
             <IconButton
@@ -133,12 +155,15 @@ export default function PersistentDrawerLeft() {
             <img  src={logo} alt="" />
             </Link>
           </div>
+          <Link to="/Ajouter-un-article">
+
           <IconButton
             color="inherit"
             sx={{width:'fit-content'}}
           >
             <DiscountIcon sx={{color:'#262D44'}}/>
           </IconButton>
+          </Link>
         </Toolbar>
         
       </AppBar>
@@ -163,16 +188,16 @@ export default function PersistentDrawerLeft() {
         <Divider />
         <List>
        
-            <Link to="/categorie" onClick={()=>{setIdCategorie('Sono')}}>
+            <Link to="/categorie" onClick={()=>{setIdCategorie('Sono'); reset()}}>
 
             <ListItem disablePadding>
               <ListItemButton>
                 <ListItemIcon>
                   <VolumeUpIcon sx={{color:'#262D44'}}/>
                 </ListItemIcon>
-                <a>
+           
                 Sono
-                </a>
+                
               </ListItemButton>
             </ListItem>
             </Link>
@@ -184,9 +209,9 @@ export default function PersistentDrawerLeft() {
                 <ListItemIcon>
                   <CameraAltIcon sx={{color:'#262D44'}}/>
                 </ListItemIcon>
-                <a>
+              
                 Caméras
-                </a>
+                
               </ListItemButton>
             </ListItem>
             </Link>
@@ -198,9 +223,9 @@ export default function PersistentDrawerLeft() {
                 <ListItemIcon>
                   <GamesIcon sx={{color:'#262D44'}}/>
                 </ListItemIcon>
-                <a>
+              
                 Jeux vidéos
-                </a>
+                
               </ListItemButton>
             </ListItem>
             </Link>
@@ -212,9 +237,9 @@ export default function PersistentDrawerLeft() {
                 <ListItemIcon>
                   <SmartphoneIcon sx={{color:'#262D44'}}/>
                 </ListItemIcon>
-                <a>
+              
                 Téléphones
-                </a>
+                
               </ListItemButton>
             </ListItem>
             </Link>
@@ -226,9 +251,9 @@ export default function PersistentDrawerLeft() {
                 <ListItemIcon>
                   <ConstructionIcon sx={{color:'#262D44'}}/>
                 </ListItemIcon>
-                <a>
+              
                 Outils
-                </a>
+                
               </ListItemButton>
             </ListItem>
             </Link>
@@ -240,9 +265,9 @@ export default function PersistentDrawerLeft() {
                 <ListItemIcon>
                   <PrecisionManufacturingIcon sx={{color:'#262D44'}}/>
                 </ListItemIcon>
-                <a>
+              
                 Machines
-                </a>
+                
               </ListItemButton>
             </ListItem>
             </Link>
@@ -252,10 +277,33 @@ export default function PersistentDrawerLeft() {
       </Drawer>
       <Main open={open} >
         <DrawerHeader />
-      <Routes>  
-        <Route path="/" element={<Home Objets = {Objets}/>} /> 
-        <Route path="/recherche" element={<FilterResult/>} /> 
-        <Route path="/categorie" element={<Categorie IdCategorie = {IdCategorie}/>} /> 
+      <Routes>
+        <Route path="/" element={<Home 
+        Objets = {Objets} 
+        setSearchTerm={setSearchTerm}
+        handleSearchTerm={handleSearchTerm}
+        setBorrowed={setBorrowed}
+        />} /> 
+        <Route path="/recherche" element={<FilterResult
+        SearchTerm={SearchTerm}
+        filteredstuffs={filteredstuffs}
+        setfilteredstuffs={setfilteredstuffs}
+        setBorrowed={setBorrowed}
+        setSingleObject={setSingleObject}
+
+        />} /> 
+        <Route path="/categorie" element={<Categorie 
+        IdCategorie = {IdCategorie}
+        setBorrowed={setBorrowed}
+        />} /> 
+        <Route path="/Ajouter-un-article" element={<SignIn/>} /> 
+        <Route path="/Ajouter-un-article/Inscription" element={<SignUp/>} /> 
+        <Route path="/Details" element={<Details
+        Borrowed={Borrowed}
+        />} /> 
+        <Route path="/Validation" element={<CheckoutForm
+         Borrowed={Borrowed}
+        />} /> 
       </Routes>
         <Footer/>
       </Main>

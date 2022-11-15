@@ -3,22 +3,15 @@ import './FilterResult.css';
 import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import image from '../../assets/image.png';
 import Divider from '@mui/material/Divider';
 import { createTheme, ThemeProvider} from '@mui/material/styles';
-import Box from '@mui/material/Box';
-
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
+import {Link } from "react-router-dom";
 
 
 
-const FilterResult = () => {
+const FilterResult = ({filteredstuffs, SearchTerm, setfilteredstuffs,setBorrowed}) => {
 
   const theme = createTheme({
     palette: {
@@ -35,308 +28,116 @@ const FilterResult = () => {
     },
   });
 
+  const Borrow=(id_objet)=>{
+    const choosenOne=filteredstuffs.filter((element,index)=>{
+      return element.id_objet === id_objet});
+      setBorrowed(choosenOne[0])
+
+
+  };
+  const [PriceFilter, setPriceFilter] = React.useState(filteredstuffs);
+  console.log(PriceFilter)
+  const handleChangePrix = (event) => {
+    
+    if(event.target.value == 0){
+    setPriceFilter(filteredstuffs);
+  }
+  if(event.target.value == 1){
+    var filteredData = filteredstuffs.filter(item => item.prix_jour < 2501 && item.prix_jour > -1);
+    setPriceFilter(filteredData);
+  }
+  if(event.target.value == 2){
+    var filteredData = filteredstuffs.filter(item => item.prix_jour < 5001 && item.prix_jour > 2500);
+    setPriceFilter(filteredData);
+  }
+  if(event.target.value == 3){
+    var filteredData = filteredstuffs.filter(item => item.prix_jour < 10001 && item.prix_jour > 5000);
+    setPriceFilter(filteredData);
+  }
+  if(event.target.value == 4){
+    var filteredData = filteredstuffs.filter(item => item.prix_jour < 20001 && item.prix_jour > 10000);
+    setPriceFilter(filteredData);
+  }
+  if(event.target.value == 5){
+    var filteredData = filteredstuffs.filter(item => item.prix_jour < 30001 && item.prix_jour > 20000);
+    setPriceFilter(filteredData);
+  }
+  if(event.target.value == 6){
+    var filteredData = filteredstuffs.filter(item => item.prix_jour > 30000);
+    setPriceFilter(filteredData);
+  }
+
+    // if(Prix === 2){
+    //   var filteredData = filteredstuffs.filter(item => item.prix >= 2501 && item.prix <= 5000);
+    // setfilteredstuffs(filteredData);
+    // }
+  };
+
+
+
     return ( 
 
         <div className="container">
-        <h2>Resultat de recherche pour: "Canon 650-D"</h2>
+        <h2>Resultat de recherche pour: "{SearchTerm}"</h2>
         <div className="filter">
-            <select name="" id="">
-                <option value={0}>--- Catégories ---</option>
-            </select>
-            <select name="" id="">
+            <select name="" id="price" onChange={handleChangePrix}>
                 <option value={0}>--- Prix --- (fcfa)</option>
-                <option>0 - 2500</option>
-                <option>2501 - 5000</option>
-                <option>5001 - 10000</option>
-                <option>10001 - 20000</option>
-                <option>10001 - 20000</option>
-                <option>Plus de 20000</option>
+                <option value={1}>0 - 2500</option>
+                <option value={2}>2501 - 5000</option>
+                <option value={3}>5001 - 10000</option>
+                <option value={4}>10001 - 20000</option>
+                <option value={5}>20001 - 30000</option>
+                <option value={6}>Plus de 30000</option>
             </select>
             
 
         </div>
-        <div className="LatestOffers">
-        <ThemeProvider theme={theme}>
+        <div id="searchResultnull" className="LatestOffers">
+        {PriceFilter.map((item) => {
 
-        <Card sx={{ width: '92%', marginBottom: 5}}  key='' >
-        <CardMedia
-          component="img"
-          height="150"
-          image={image}
-          alt="Chaussure"
-        />
-        <CardContent>
 
-        
-          <strong >Canon 650-D</strong><br />
-          
-          <Typography className='text'  variant="text" color="text.secondary">
-            Caméra 
-          </Typography>
-
-          <br />
-          <Typography  variant="h7" className='text'>
-          8000 fcfa /Jour
-          </Typography> <br />
-          <Typography  variant="h7" className='text'>
-          40000 fcfa /Semaine
-          </Typography>
-        </CardContent>
-        <Divider/>
-
-        <CardActions>
-          <Button size="medium" variant="contained" color='secondary'> <strong className='text'>Emprunter</strong></Button>
-          <Button size="small" ><span className='text'>VOIR</span></Button>
-        </CardActions>
-          </Card>
-          </ThemeProvider>
+  // var cate = filteredstuffs
+  
+                return(
+                  <div key={item.id_objet} className='object'>
 
           <ThemeProvider theme={theme}>
 
-        <Card sx={{ width: '92%', marginBottom: 5}}  key='' >
-        <CardMedia
-          component="img"
-          height="150"
-          image={image}
-          alt="Chaussure"
-        />
+        <Card sx={{ width: '95%', marginBottom: 1}}  key='' >
+        <div className="img"
+        style={{backgroundImage:`URL(./images/${item.image1})`}}
+        ></div>
         <CardContent>
 
         
-          <strong >Canon 650-D</strong><br />
+          <strong  >{item.objet}</strong><br />
           
           <Typography className='text'  variant="text" color="text.secondary">
-            Caméra 
+          {item.Categorie} 
           </Typography>
 
           <br />
           <Typography  variant="h7" className='text'>
-          8000 fcfa /Jour
-          </Typography> <br />
-          <Typography  variant="h7" className='text'>
-          40000 fcfa /Semaine
+          {item.prix_jour} fcfa /Jour
           </Typography>
         </CardContent>
         <Divider/>
 
         <CardActions>
-          <Button size="medium" variant="contained" color='secondary'> <strong className='text'>Emprunter</strong></Button>
-          <Button size="small" ><span className='text'>VOIR</span></Button>
+        <Link to="/Validation">
+          <Button size="small" variant="contained" color='secondary' onClick={()=>Borrow(item.id_objet)} > <strong className='text'>Emprunter</strong></Button>
+        </Link>
+        <Link to="/Details">
+          <Button size="small" onClick={()=>Borrow(item.id_objet)}><span className='text'>VOIR</span></Button>
+
+        </Link>
         </CardActions>
           </Card>
           </ThemeProvider>
-
-          <ThemeProvider theme={theme}>
-
-        <Card sx={{ width: '92%', marginBottom: 5}}  key='' >
-        <CardMedia
-          component="img"
-          height="150"
-          image={image}
-          alt="Chaussure"
-        />
-        <CardContent>
+          </div>
+              )})}
 
         
-          <strong >Canon 650-D</strong><br />
-          
-          <Typography className='text'  variant="text" color="text.secondary">
-            Caméra 
-          </Typography>
-
-          <br />
-          <Typography  variant="h7" className='text'>
-          8000 fcfa /Jour
-          </Typography> <br />
-          <Typography  variant="h7" className='text'>
-          40000 fcfa /Semaine
-          </Typography>
-        </CardContent>
-        <Divider/>
-
-        <CardActions>
-          <Button size="medium" variant="contained" color='secondary'> <strong className='text'>Emprunter</strong></Button>
-          <Button size="small" ><span className='text'>VOIR</span></Button>
-        </CardActions>
-          </Card>
-          </ThemeProvider>
-
-          <ThemeProvider theme={theme}>
-
-        <Card sx={{ width: '92%', marginBottom: 5}}  key='' >
-        <CardMedia
-          component="img"
-          height="150"
-          image={image}
-          alt="Chaussure"
-        />
-        <CardContent>
-
-        
-          <strong >Canon 650-D</strong><br />
-          
-          <Typography className='text'  variant="text" color="text.secondary">
-            Caméra 
-          </Typography>
-
-          <br />
-          <Typography  variant="h7" className='text'>
-          8000 fcfa /Jour
-          </Typography> <br />
-          <Typography  variant="h7" className='text'>
-          40000 fcfa /Semaine
-          </Typography>
-        </CardContent>
-        <Divider/>
-
-        <CardActions>
-          <Button size="medium" variant="contained" color='secondary'> <strong className='text'>Emprunter</strong></Button>
-          <Button size="small" ><span className='text'>VOIR</span></Button>
-        </CardActions>
-          </Card>
-          </ThemeProvider>
-
-          <ThemeProvider theme={theme}>
-
-        <Card sx={{ width: '92%', marginBottom: 5}}  key='' >
-        <CardMedia
-          component="img"
-          height="150"
-          image={image}
-          alt="Chaussure"
-        />
-        <CardContent>
-
-        
-          <strong >Canon 650-D</strong><br />
-          
-          <Typography className='text'  variant="text" color="text.secondary">
-            Caméra 
-          </Typography>
-
-          <br />
-          <Typography  variant="h7" className='text'>
-          8000 fcfa /Jour
-          </Typography> <br />
-          <Typography  variant="h7" className='text'>
-          40000 fcfa /Semaine
-          </Typography>
-        </CardContent>
-        <Divider/>
-
-        <CardActions>
-          <Button size="medium" variant="contained" color='secondary'> <strong className='text'>Emprunter</strong></Button>
-          <Button size="small" ><span className='text'>VOIR</span></Button>
-        </CardActions>
-          </Card>
-          </ThemeProvider>
-
-          <ThemeProvider theme={theme}>
-
-        <Card sx={{ width: '92%', marginBottom: 5}}  key='' >
-        <CardMedia
-          component="img"
-          height="150"
-          image={image}
-          alt="Chaussure"
-        />
-        <CardContent>
-
-        
-          <strong >Canon 650-D</strong><br />
-          
-          <Typography className='text'  variant="text" color="text.secondary">
-            Caméra 
-          </Typography>
-
-          <br />
-          <Typography  variant="h7" className='text'>
-          8000 fcfa /Jour
-          </Typography> <br />
-          <Typography  variant="h7" className='text'>
-          40000 fcfa /Semaine
-          </Typography>
-        </CardContent>
-        <Divider/>
-
-        <CardActions>
-          <Button size="medium" variant="contained" color='secondary'> <strong className='text'>Emprunter</strong></Button>
-          <Button size="small" ><span className='text'>VOIR</span></Button>
-        </CardActions>
-          </Card>
-          </ThemeProvider>
-
-          <ThemeProvider theme={theme}>
-
-        <Card sx={{ width: '92%', marginBottom: 5}}  key='' >
-        <CardMedia
-          component="img"
-          height="150"
-          image={image}
-          alt="Chaussure"
-        />
-        <CardContent>
-
-        
-          <strong >Canon 650-D</strong><br />
-          
-          <Typography className='text'  variant="text" color="text.secondary">
-            Caméra 
-          </Typography>
-
-          <br />
-          <Typography  variant="h7" className='text'>
-          8000 fcfa /Jour
-          </Typography> <br />
-          <Typography  variant="h7" className='text'>
-          40000 fcfa /Semaine
-          </Typography>
-        </CardContent>
-        <Divider/>
-
-        <CardActions>
-          <Button size="medium" variant="contained" color='secondary'> <strong className='text'>Emprunter</strong></Button>
-          <Button size="small" ><span className='text'>VOIR</span></Button>
-        </CardActions>
-          </Card>
-          </ThemeProvider>
-
-          <ThemeProvider theme={theme}>
-
-        <Card sx={{ width: '92%', marginBottom: 5}}  key='' >
-        <CardMedia
-          component="img"
-          height="150"
-          image={image}
-          alt="Chaussure"
-        />
-        <CardContent>
-
-        
-          <strong >Canon 650-D</strong><br />
-          
-          <Typography className='text'  variant="text" color="text.secondary">
-            Caméra 
-          </Typography>
-
-          <br />
-          <Typography  variant="h7" className='text'>
-          8000 fcfa /Jour
-          </Typography> <br />
-          <Typography  variant="h7" className='text'>
-          40000 fcfa /Semaine
-          </Typography>
-        </CardContent>
-        <Divider/>
-
-        <CardActions>
-          <Button size="medium" variant="contained" color='secondary'> <strong className='text'>Emprunter</strong></Button>
-          <Button size="small" ><span className='text'>VOIR</span></Button>
-        </CardActions>
-          </Card>
-          </ThemeProvider>
-
-
         </div>
         </div>
      );
